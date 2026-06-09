@@ -85,14 +85,14 @@ export default function Home() {
     <div style={{ width: '100%' }}>
 
       {/* Hero */}
-      <div style={{ background: '#000', color: '#fff', width: '100%', padding: '60px 24px', textAlign: 'center', marginBottom: '40px' }}>
-        <h1 style={{ fontSize: '48px', fontWeight: 800, marginBottom: '12px' }}>
-          Maquinaria Civil <span style={{ color: '#facc15' }}>Avanzada</span>
-        </h1>
-        <p style={{ color: '#9ca3af', fontSize: '18px' }}>
-          Herramientas y equipos de alta calidad para tu obra
-        </p>
-      </div>
+<div style={{ background: '#000', color: '#fff', width: '100%', padding: '40px 20px', textAlign: 'center', marginBottom: '32px' }}>
+  <h1 style={{ fontSize: 'clamp(28px, 6vw, 48px)', fontWeight: 800, marginBottom: '10px' }}>
+    Maquinaria Civil <span style={{ color: '#facc15' }}>Avanzada</span>
+  </h1>
+  <p style={{ color: '#9ca3af', fontSize: 'clamp(14px, 3vw, 18px)' }}>
+    Herramientas y equipos de alta calidad para tu obra
+  </p>
+</div>
 
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px 60px' }}>
 

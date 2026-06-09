@@ -54,14 +54,14 @@ export default function Navbar() {
 
         <Link href="/" style={{ fontSize: '16px', fontWeight: 800, textDecoration: 'none', color: '#fff', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}>
           <span style={{ color: '#facc15', fontSize: '20px' }}>⚙</span>
-          MCA<span style={{ color: '#facc15' }}></span>
+          Maquinaria Civil Avanzada<span style={{ color: '#facc15' }}></span>
         </Link>
 
         {/* Desktop links */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '20px', fontSize: '14px', fontWeight: 600 }} className="desktop-nav">
           <Link href="/" style={{ color: '#fff', textDecoration: 'none' }}>Productos</Link>
           <Link href="/carrito" style={{ color: '#fff', textDecoration: 'none', position: 'relative' }}>
-            🛒 {cartCount > 0 && <span style={{ background: '#facc15', color: '#000', fontSize: '11px', borderRadius: '999px', padding: '1px 6px', marginLeft: '4px', fontWeight: 800 }}>{cartCount}</span>}
+            🛒 Carrito {cartCount > 0 && <span style={{ background: '#facc15', color: '#000', fontSize: '11px', borderRadius: '999px', padding: '1px 6px', marginLeft: '4px', fontWeight: 800 }}>{cartCount}</span>}
           </Link>
           {user ? (
             <>

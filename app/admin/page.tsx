@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
+import imageCompression from 'browser-image-compression'
 
 interface Category { id: string; name: string; slug: string }
 interface Product { id: string; name: string; price: number; stock: number; active: boolean; categories: { name: string } | null }
@@ -18,6 +19,7 @@ export default function AdminPage() {
     category_id: string; images: string[]; specs: { key: string; value: string }[]; active: boolean
   }>({ name: '', description: '', price: '', stock: '', category_id: '', images: [], specs: [], active: true })
   const [savingProduct, setSavingProduct] = useState(false)
+  const [uploadingImages, setUploadingImages] = useState(false)
 
   useEffect(() => { fetchCategories(); fetchProducts() }, [])
 
@@ -66,6 +68,42 @@ export default function AdminPage() {
     setShowProductForm(true)
   }
 
+  async function handleImageUpload(files: FileList) {
+    setUploadingImages(true)
+    const newUrls: string[] = []
+
+    for (const file of Array.from(files)) {
+      try {
+        const compressed = await imageCompression(file, {
+          maxSizeMB: 0.3,
+          maxWidthOrHeight: 1200,
+          useWebWorker: true,
+        })
+
+        const formData = new FormData()
+        formData.append('file', compressed, file.name)
+
+        const res = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+        })
+
+        const result = await res.json()
+
+        if (result.error) {
+          alert('Error: ' + result.error)
+        } else {
+          newUrls.push(result.url)
+        }
+      } catch (err: any) {
+        alert('Error: ' + err.message)
+      }
+    }
+
+    setProductForm(prev => ({ ...prev, images: [...prev.images, ...newUrls] }))
+    setUploadingImages(false)
+  }
+
   async function handleSaveProduct() {
     if (!productForm.name || !productForm.price) return
     setSavingProduct(true)
@@ -110,7 +148,6 @@ export default function AdminPage() {
 
       <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '32px 24px' }}>
 
-        {/* Stats */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px', marginBottom: '32px' }}>
           {[
             { label: 'Categorías', value: categories.length, icon: '📁' },
@@ -127,7 +164,6 @@ export default function AdminPage() {
           ))}
         </div>
 
-        {/* Tabs */}
         <div style={{ display: 'flex', gap: '8px', marginBottom: '24px' }}>
           {tabs.map(t => (
             <button key={t.key} onClick={() => setTab(t.key)}
@@ -137,7 +173,6 @@ export default function AdminPage() {
           ))}
         </div>
 
-        {/* TAB CATEGORÍAS */}
         {tab === 'categorias' && (
           <div style={{ background: '#fff', borderRadius: '16px', border: '1px solid #e5e7eb', padding: '28px' }}>
             <h2 style={{ fontSize: '18px', fontWeight: 800, marginBottom: '20px' }}>Categorías</h2>
@@ -170,7 +205,6 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* TAB PRODUCTOS */}
         {tab === 'productos' && (
           <div style={{ background: '#fff', borderRadius: '16px', border: '1px solid #e5e7eb', padding: '28px' }}>
             {!showProductForm ? (
@@ -261,32 +295,30 @@ export default function AdminPage() {
                     </select>
                   </div>
 
-                  {/* Fotos múltiples */}
                   <div>
                     <label style={{ fontSize: '13px', fontWeight: 700, color: '#374151', display: 'block', marginBottom: '6px' }}>Fotos del producto</label>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      {productForm.images.map((url, i) => (
-                        <div key={i} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                          <input type="text" placeholder={`URL foto ${i + 1}`} value={url}
-                            onChange={e => {
-                              const imgs = [...productForm.images]
-                              imgs[i] = e.target.value
-                              setProductForm({ ...productForm, images: imgs })
-                            }}
-                            style={{ flex: 1, border: '1.5px solid #e5e7eb', borderRadius: '8px', padding: '8px 12px', fontSize: '13px', outline: 'none' }} />
-                          {url && <img src={url} alt="" style={{ width: '36px', height: '36px', objectFit: 'cover', borderRadius: '6px', border: '1px solid #e5e7eb' }} />}
-                          <button onClick={() => setProductForm({ ...productForm, images: productForm.images.filter((_, j) => j !== i) })}
-                            style={{ background: '#fef2f2', color: '#dc2626', border: 'none', borderRadius: '6px', padding: '6px 10px', cursor: 'pointer', fontWeight: 700 }}>✕</button>
-                        </div>
-                      ))}
-                      <button onClick={() => setProductForm({ ...productForm, images: [...productForm.images, ''] })}
-                        style={{ background: '#f3f4f6', color: '#374151', border: '1.5px dashed #d1d5db', borderRadius: '8px', padding: '8px', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}>
-                        + Agregar foto
-                      </button>
-                    </div>
+                    {productForm.images.length > 0 && (
+                      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '12px' }}>
+                        {productForm.images.map((url, i) => (
+                          <div key={i} style={{ position: 'relative', width: '80px', height: '80px' }}>
+                            <img src={url} alt={`foto ${i + 1}`} style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #e5e7eb' }} />
+                            <button onClick={() => setProductForm({ ...productForm, images: productForm.images.filter((_, j) => j !== i) })}
+                              style={{ position: 'absolute', top: '-6px', right: '-6px', background: '#dc2626', color: '#fff', border: 'none', borderRadius: '999px', width: '20px', height: '20px', fontSize: '11px', cursor: 'pointer', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              ✕
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    <label style={{ display: 'block', background: uploadingImages ? '#f3f4f6' : '#000', color: uploadingImages ? '#9ca3af' : '#facc15', borderRadius: '8px', padding: '12px', fontSize: '13px', fontWeight: 700, cursor: uploadingImages ? 'not-allowed' : 'pointer', textAlign: 'center' }}>
+                      {uploadingImages ? 'Subiendo...' : '📁 Seleccionar fotos'}
+                      <input type="file" accept="image/*" multiple
+                        style={{ display: 'none' }}
+                        disabled={uploadingImages}
+                        onChange={e => e.target.files && handleImageUpload(e.target.files)} />
+                    </label>
                   </div>
 
-                  {/* Especificaciones técnicas */}
                   <div>
                     <label style={{ fontSize: '13px', fontWeight: 700, color: '#374151', display: 'block', marginBottom: '6px' }}>Especificaciones técnicas</label>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -328,7 +360,7 @@ export default function AdminPage() {
                 </div>
 
                 <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
-                  <button onClick={handleSaveProduct} disabled={savingProduct}
+                  <button onClick={handleSaveProduct} disabled={savingProduct || uploadingImages}
                     style={{ background: '#000', color: '#facc15', border: 'none', borderRadius: '8px', padding: '12px 28px', fontWeight: 800, fontSize: '14px', cursor: 'pointer' }}>
                     {savingProduct ? 'Guardando...' : 'Guardar'}
                   </button>
@@ -342,7 +374,6 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* TAB PEDIDOS */}
         {tab === 'pedidos' && <PedidosAdmin />}
       </div>
     </div>
@@ -357,11 +388,7 @@ function PedidosAdmin() {
       .from('orders')
       .select('*, order_items(*, products(name))')
       .order('created_at', { ascending: false })
-      .then(({ data, error }) => {
-        console.log('pedidos:', data)
-        console.log('error:', error)
-        if (data) setOrders(data)
-      })
+      .then(({ data }) => { if (data) setOrders(data) })
   }, [])
 
   async function updateStatus(id: string, status: string) {

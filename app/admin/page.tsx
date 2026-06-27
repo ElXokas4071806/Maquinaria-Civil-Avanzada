@@ -92,7 +92,7 @@ export default function AdminPage() {
           continue
         }
 
-        const { data: publicData } = supabase.storage.from('imagenes').getPublicUrl(uploadData.path)
+        const { data: publicData } = supabase.storage.from('productos').getPublicUrl(uploadData.path)
         newUrls.push(publicData.publicUrl)
       } catch (err: any) {
         alert('Error: ' + err.message)

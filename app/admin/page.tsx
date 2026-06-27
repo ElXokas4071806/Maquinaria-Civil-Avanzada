@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabase'
 import imageCompression from 'browser-image-compression'
 
 interface Category { id: string; name: string; slug: string }
-interface Product { id: string; name: string; price: number; stock: number; active: boolean; categories: { name: string } | null }
+interface Product { id: string; name: string; price: number; stock: number; active: boolean; featured: boolean; categories: { name: string } | null }
 
 export default function AdminPage() {
   const [tab, setTab] = useState<'categorias' | 'productos' | 'pedidos'>('categorias')
@@ -16,8 +16,8 @@ export default function AdminPage() {
   const [editingProduct, setEditingProduct] = useState<any>(null)
   const [productForm, setProductForm] = useState<{
     name: string; description: string; price: string; stock: string
-    category_id: string; images: string[]; specs: { key: string; value: string }[]; active: boolean
-  }>({ name: '', description: '', price: '', stock: '', category_id: '', images: [], specs: [], active: true })
+    category_id: string; images: string[]; specs: { key: string; value: string }[]; active: boolean; featured: boolean
+  }>({ name: '', description: '', price: '', stock: '', category_id: '', images: [], specs: [], active: true, featured: false })
   const [savingProduct, setSavingProduct] = useState(false)
   const [uploadingImages, setUploadingImages] = useState(false)
 
@@ -54,7 +54,7 @@ export default function AdminPage() {
 
   function openNewProduct() {
     setEditingProduct(null)
-    setProductForm({ name: '', description: '', price: '', stock: '', category_id: '', images: [], specs: [], active: true })
+    setProductForm({ name: '', description: '', price: '', stock: '', category_id: '', images: [], specs: [], active: true, featured: false })
     setShowProductForm(true)
   }
 
@@ -63,7 +63,7 @@ export default function AdminPage() {
     setProductForm({
       name: p.name, description: p.description || '', price: String(p.price),
       stock: String(p.stock), category_id: p.category_id || '',
-      images: p.images || [], specs: p.specs || [], active: p.active
+      images: p.images || [], specs: p.specs || [], active: p.active, featured: p.featured || false
     })
     setShowProductForm(true)
   }
@@ -80,21 +80,20 @@ export default function AdminPage() {
           useWebWorker: true,
         })
 
-        const formData = new FormData()
-        formData.append('file', compressed, file.name)
+        const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg'
+        const fileName = `producto-${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
 
-        const res = await fetch('/api/upload', {
-          method: 'POST',
-          body: formData,
-        })
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('imagenes')
+          .upload(fileName, compressed, { cacheControl: '3600', upsert: false })
 
-        const result = await res.json()
-
-        if (result.error) {
-          alert('Error: ' + result.error)
-        } else {
-          newUrls.push(result.url)
+        if (uploadError) {
+          alert('Error subiendo: ' + uploadError.message)
+          continue
         }
+
+        const { data: publicData } = supabase.storage.from('imagenes').getPublicUrl(uploadData.path)
+        newUrls.push(publicData.publicUrl)
       } catch (err: any) {
         alert('Error: ' + err.message)
       }
@@ -113,7 +112,8 @@ export default function AdminPage() {
       stock: parseInt(productForm.stock) || 0, category_id: productForm.category_id || null,
       images: productForm.images.filter(i => i.trim() !== ''),
       specs: productForm.specs.filter(s => s.key.trim() !== ''),
-      active: productForm.active
+      active: productForm.active,
+      featured: productForm.featured
     }
     if (editingProduct) await supabase.from('products').update(payload).eq('id', editingProduct.id)
     else await supabase.from('products').insert(payload)
@@ -153,6 +153,7 @@ export default function AdminPage() {
             { label: 'Categorías', value: categories.length, icon: '📁' },
             { label: 'Productos', value: products.length, icon: '📦' },
             { label: 'Activos', value: products.filter(p => p.active).length, icon: '✅' },
+            { label: 'Destacados', value: products.filter(p => p.featured).length, icon: '⭐' },
           ].map(stat => (
             <div key={stat.label} style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '20px 24px', display: 'flex', alignItems: 'center', gap: '16px' }}>
               <span style={{ fontSize: '32px' }}>{stat.icon}</span>
@@ -223,7 +224,10 @@ export default function AdminPage() {
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                         <span style={{ fontSize: '20px' }}>📦</span>
                         <div>
-                          <p style={{ fontWeight: 700, color: '#111', margin: 0, fontSize: '15px' }}>{p.name}</p>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <p style={{ fontWeight: 700, color: '#111', margin: 0, fontSize: '15px' }}>{p.name}</p>
+                            {p.featured && <span style={{ fontSize: '11px', background: '#fffbeb', color: '#ca8a04', border: '1px solid #fde68a', borderRadius: '999px', padding: '2px 8px', fontWeight: 700 }}>⭐ Destacado</span>}
+                          </div>
                           <p style={{ fontSize: '12px', color: '#9ca3af', margin: 0 }}>{p.categories?.name || 'Sin categoría'} · ${p.price.toLocaleString('es-CO')} · {p.stock} en stock</p>
                         </div>
                       </div>
@@ -349,13 +353,23 @@ export default function AdminPage() {
                     </div>
                   </div>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <input type="checkbox" id="active" checked={productForm.active}
-                      onChange={e => setProductForm({ ...productForm, active: e.target.checked })}
-                      style={{ width: '16px', height: '16px', cursor: 'pointer' }} />
-                    <label htmlFor="active" style={{ fontSize: '14px', color: '#374151', cursor: 'pointer' }}>
-                      Producto activo (visible en tienda)
-                    </label>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <input type="checkbox" id="active" checked={productForm.active}
+                        onChange={e => setProductForm({ ...productForm, active: e.target.checked })}
+                        style={{ width: '16px', height: '16px', cursor: 'pointer' }} />
+                      <label htmlFor="active" style={{ fontSize: '14px', color: '#374151', cursor: 'pointer' }}>
+                        Producto activo (visible en tienda)
+                      </label>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <input type="checkbox" id="featured" checked={productForm.featured}
+                        onChange={e => setProductForm({ ...productForm, featured: e.target.checked })}
+                        style={{ width: '16px', height: '16px', cursor: 'pointer' }} />
+                      <label htmlFor="featured" style={{ fontSize: '14px', color: '#374151', cursor: 'pointer' }}>
+                        ⭐ Producto destacado (aparece en carrusel)
+                      </label>
+                    </div>
                   </div>
                 </div>
 

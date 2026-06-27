@@ -110,7 +110,7 @@ export default function Home() {
       {/* Hero */}
       <div style={{ background: '#000', color: '#fff', width: '100%', padding: '60px 24px', textAlign: 'center' }}>
         <h1 style={{ fontSize: '48px', fontWeight: 800, marginBottom: '12px' }}>
-          MCA <span style={{ color: '#facc15' }}>Avanzada</span>
+          Maquinaria Civil <span style={{ color: '#facc15' }}>Avanzada</span>
         </h1>
         <p style={{ color: '#9ca3af', fontSize: '18px' }}>
           Herramientas y equipos de alta calidad para tu obra

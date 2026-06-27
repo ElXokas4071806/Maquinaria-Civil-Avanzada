@@ -39,6 +39,7 @@ export default function Home() {
     fetchCategories()
     fetchProducts()
     fetchFeatured()
+    console.log('useEffect ejecutado')
   }, [])
 
   useEffect(() => {

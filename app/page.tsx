@@ -30,7 +30,6 @@ export default function Home() {
   const [addingToCart, setAddingToCart] = useState<string | null>(null)
   const [user, setUser] = useState<any>(null)
   const [currentSlide, setCurrentSlide] = useState(0)
-  const carouselRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -39,7 +38,6 @@ export default function Home() {
     fetchCategories()
     fetchProducts()
     fetchFeatured()
-    console.log('useEffect ejecutado')
   }, [])
 
   useEffect(() => {
@@ -56,12 +54,13 @@ export default function Home() {
   }
 
   async function fetchFeatured() {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('products')
       .select('*, categories(name)')
       .eq('active', true)
       .eq('featured', true)
       .order('created_at', { ascending: false })
+    console.log('destacados:', data, 'error:', error)
     if (data) setFeaturedProducts(data)
   }
 
@@ -109,7 +108,7 @@ export default function Home() {
     <div style={{ width: '100%' }}>
 
       {/* Hero */}
-      <div style={{ background: '#000', color: '#fff', width: '100%', padding: '60px 24px', textAlign: 'center', marginBottom: '0' }}>
+      <div style={{ background: '#000', color: '#fff', width: '100%', padding: '60px 24px', textAlign: 'center' }}>
         <h1 style={{ fontSize: '48px', fontWeight: 800, marginBottom: '12px' }}>
           Maquinaria Civil <span style={{ color: '#facc15' }}>Avanzada</span>
         </h1>
@@ -120,77 +119,79 @@ export default function Home() {
 
       {/* Carrusel de destacados */}
       {featuredProducts.length > 0 && (
-        <div style={{ background: '#111', padding: '40px 0', marginBottom: '48px' }}>
-          <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px' }}>
-            <p style={{ color: '#facc15', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '24px' }}>
+        <div style={{ background: '#f9fafb', padding: '48px 0', marginBottom: '48px', borderBottom: '1px solid #e5e7eb' }}>
+          <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 60px' }}>
+            <p style={{ color: '#ca8a04', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '24px' }}>
               ⭐ Productos destacados
             </p>
-            <div style={{ position: 'relative', overflow: 'hidden' }}>
-              <div style={{ display: 'flex', transition: 'transform 0.5s ease', transform: `translateX(-${currentSlide * 100}%)` }}>
-                {featuredProducts.map((product, index) => (
-                  <div key={product.id} style={{ minWidth: '100%', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px', alignItems: 'center' }}>
-                    <div style={{ borderRadius: '16px', overflow: 'hidden', background: '#1a1a1a', aspectRatio: '1', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      {product.images?.[0] ? (
-                        <img src={product.images[0]} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                      ) : (
-                        <span style={{ fontSize: '80px' }}>⚙️</span>
-                      )}
-                    </div>
-                    <div>
-                      {product.categories && (
-                        <span style={{ fontSize: '12px', color: '#facc15', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                          {product.categories.name}
-                        </span>
-                      )}
-                      <h2 style={{ fontSize: '36px', fontWeight: 800, color: '#fff', margin: '8px 0 16px', lineHeight: 1.2 }}>
-                        {product.name}
-                      </h2>
-                      {product.description && (
-                        <p style={{ color: '#9ca3af', fontSize: '15px', lineHeight: 1.7, marginBottom: '24px' }}>
-                          {product.description.slice(0, 120)}{product.description.length > 120 ? '...' : ''}
+            <div style={{ position: 'relative' }}>
+              <div style={{ overflow: 'hidden' }}>
+                <div style={{ display: 'flex', transition: 'transform 0.5s ease', transform: `translateX(-${currentSlide * 100}%)` }}>
+                  {featuredProducts.map((product) => (
+                    <div key={product.id} style={{ minWidth: '100%', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '48px', alignItems: 'center' }}>
+                      <div style={{ borderRadius: '16px', overflow: 'hidden', background: '#fff', border: '1px solid #e5e7eb', aspectRatio: '1', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        {product.images?.[0] ? (
+                          <img src={product.images[0]} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        ) : (
+                          <span style={{ fontSize: '80px' }}>⚙️</span>
+                        )}
+                      </div>
+                      <div>
+                        {product.categories && (
+                          <span style={{ fontSize: '12px', color: '#ca8a04', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                            {product.categories.name}
+                          </span>
+                        )}
+                        <h2 style={{ fontSize: '36px', fontWeight: 800, color: '#111', margin: '8px 0 16px', lineHeight: 1.2 }}>
+                          {product.name}
+                        </h2>
+                        {product.description && (
+                          <p style={{ color: '#6b7280', fontSize: '15px', lineHeight: 1.7, marginBottom: '24px' }}>
+                            {product.description.slice(0, 120)}{product.description.length > 120 ? '...' : ''}
+                          </p>
+                        )}
+                        <p style={{ fontSize: '36px', fontWeight: 900, color: '#111', marginBottom: '24px' }}>
+                          ${product.price.toLocaleString('es-CO')}
                         </p>
-                      )}
-                      <p style={{ fontSize: '36px', fontWeight: 900, color: '#fff', marginBottom: '24px' }}>
-                        ${product.price.toLocaleString('es-CO')}
-                      </p>
-                      <div style={{ display: 'flex', gap: '12px' }}>
-                        <Link href={`/productos/${product.slug}`}
-                          style={{ background: '#facc15', color: '#000', padding: '12px 28px', borderRadius: '8px', fontWeight: 800, textDecoration: 'none', fontSize: '15px' }}>
-                          Ver producto
-                        </Link>
-                        <button onClick={() => addToCart(product.id, product.stock)}
-                          disabled={product.stock === 0 || addingToCart === product.id}
-                          style={{ background: 'transparent', color: '#fff', border: '1.5px solid #fff', padding: '12px 28px', borderRadius: '8px', fontWeight: 700, fontSize: '15px', cursor: 'pointer' }}>
-                          {addingToCart === product.id ? 'Agregando...' : 'Agregar al carrito'}
-                        </button>
+                        <div style={{ display: 'flex', gap: '12px' }}>
+                          <Link href={`/productos/${product.slug}`}
+                            style={{ background: '#000', color: '#facc15', padding: '12px 28px', borderRadius: '8px', fontWeight: 800, textDecoration: 'none', fontSize: '15px' }}>
+                            Ver producto
+                          </Link>
+                          <button onClick={() => addToCart(product.id, product.stock)}
+                            disabled={product.stock === 0 || addingToCart === product.id}
+                            style={{ background: 'transparent', color: '#111', border: '1.5px solid #111', padding: '12px 28px', borderRadius: '8px', fontWeight: 700, fontSize: '15px', cursor: 'pointer' }}>
+                            {addingToCart === product.id ? 'Agregando...' : 'Agregar al carrito'}
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
+
+              {/* Flechas */}
+              {featuredProducts.length > 1 && (
+                <>
+                  <button onClick={() => setCurrentSlide(prev => (prev - 1 + featuredProducts.length) % featuredProducts.length)}
+                    style={{ position: 'absolute', left: '-48px', top: '50%', transform: 'translateY(-50%)', background: '#000', color: '#facc15', border: 'none', borderRadius: '999px', width: '40px', height: '40px', fontSize: '22px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}>
+                    ‹
+                  </button>
+                  <button onClick={() => setCurrentSlide(prev => (prev + 1) % featuredProducts.length)}
+                    style={{ position: 'absolute', right: '-48px', top: '50%', transform: 'translateY(-50%)', background: '#000', color: '#facc15', border: 'none', borderRadius: '999px', width: '40px', height: '40px', fontSize: '22px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}>
+                    ›
+                  </button>
+                </>
+              )}
 
               {/* Indicadores */}
               {featuredProducts.length > 1 && (
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '32px' }}>
                   {featuredProducts.map((_, i) => (
                     <button key={i} onClick={() => setCurrentSlide(i)}
-                      style={{ width: i === currentSlide ? '24px' : '8px', height: '8px', borderRadius: '999px', background: i === currentSlide ? '#facc15' : '#444', border: 'none', cursor: 'pointer', transition: 'all 0.3s', padding: 0 }} />
+                      style={{ width: i === currentSlide ? '24px' : '8px', height: '8px', borderRadius: '999px', background: i === currentSlide ? '#000' : '#d1d5db', border: 'none', cursor: 'pointer', transition: 'all 0.3s', padding: 0 }} />
                   ))}
                 </div>
-              )}
-
-              {/* Flechas */}
-              {featuredProducts.length > 1 && (
-                <>
-                  <button onClick={() => setCurrentSlide(prev => (prev - 1 + featuredProducts.length) % featuredProducts.length)}
-                    style={{ position: 'absolute', left: '-12px', top: '40%', transform: 'translateY(-50%)', background: '#222', color: '#fff', border: 'none', borderRadius: '999px', width: '40px', height: '40px', fontSize: '18px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    ‹
-                  </button>
-                  <button onClick={() => setCurrentSlide(prev => (prev + 1) % featuredProducts.length)}
-                    style={{ position: 'absolute', right: '-12px', top: '40%', transform: 'translateY(-50%)', background: '#222', color: '#fff', border: 'none', borderRadius: '999px', width: '40px', height: '40px', fontSize: '18px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    ›
-                  </button>
-                </>
               )}
             </div>
           </div>

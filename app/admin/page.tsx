@@ -84,7 +84,7 @@ export default function AdminPage() {
         const fileName = `producto-${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
 
         const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('imagenes')
+          .from('productos')
           .upload(fileName, compressed, { cacheControl: '3600', upsert: false })
 
         if (uploadError) {

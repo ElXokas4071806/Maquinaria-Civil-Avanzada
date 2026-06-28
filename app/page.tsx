@@ -273,8 +273,30 @@ export default function Home() {
                   <button
                     onClick={() => addToCart(product.id, product.stock)}
                     disabled={product.stock === 0 || addingToCart === product.id}
-                    style={{ marginTop: '12px', width: '100%', background: product.stock === 0 ? '#d1d5db' : '#000', color: product.stock === 0 ? '#9ca3af' : '#facc15', padding: '10px', borderRadius: '8px', fontSize: '13px', fontWeight: 700, border: 'none', cursor: product.stock === 0 ? 'not-allowed' : 'pointer' }}>
-                    {addingToCart === product.id ? 'Agregando...' : 'Agregar al carrito'}
+                    style={{ marginTop: '12px', width: '100%', background: product.stock === 0 ? '#d1d5db' : '#000', color: product.stock === 0 ? '#9ca3af' : '#facc15', padding: '10px', borderRadius: '8px', fontSize: '13px', fontWeight: 700, border: 'none', cursor: product.stock === 0 ? 'not-allowed' : 'pointer', overflow: 'hidden', position: 'relative', height: '38px' }}
+                    onMouseEnter={e => {
+                      if (product.stock === 0) return
+                      const text = e.currentTarget.querySelector('.btn-text') as HTMLElement
+                      const icon = e.currentTarget.querySelector('.btn-icon') as HTMLElement
+                      if (text) text.style.transform = 'translateY(-100%)'
+                      if (icon) icon.style.transform = 'translateY(0%)'
+                    }}
+                    onMouseLeave={e => {
+                      const text = e.currentTarget.querySelector('.btn-text') as HTMLElement
+                      const icon = e.currentTarget.querySelector('.btn-icon') as HTMLElement
+                      if (text) text.style.transform = 'translateY(0%)'
+                      if (icon) icon.style.transform = 'translateY(100%)'
+                    }}>
+                    <span className="btn-text" style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'transform 0.3s ease' }}>
+                      {addingToCart === product.id ? 'Agregando...' : 'Agregar al carrito'}
+                    </span>
+                    <span className="btn-icon" style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', transform: 'translateY(100%)', transition: 'transform 0.3s ease' }}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                        <line x1="12" y1="10" x2="12" y2="16"/><line x1="9" y1="13" x2="15" y2="13"/>
+                      </svg>
+                    </span>
                   </button>
                 </div>
               </div>

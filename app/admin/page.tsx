@@ -11,6 +11,8 @@ export default function AdminPage() {
   const [categories, setCategories] = useState<Category[]>([])
   const [newCatName, setNewCatName] = useState('')
   const [savingCat, setSavingCat] = useState(false)
+  const [editingCat, setEditingCat] = useState<Category | null>(null)
+  const [editCatName, setEditCatName] = useState('')
   const [products, setProducts] = useState<Product[]>([])
   const [showProductForm, setShowProductForm] = useState(false)
   const [editingProduct, setEditingProduct] = useState<any>(null)
@@ -37,6 +39,16 @@ export default function AdminPage() {
     setSavingCat(true)
     await supabase.from('categories').insert({ name: newCatName.trim(), slug: toSlug(newCatName) })
     setNewCatName('')
+    await fetchCategories()
+    setSavingCat(false)
+  }
+
+  async function handleEditCategory() {
+    if (!editingCat || !editCatName.trim()) return
+    setSavingCat(true)
+    await supabase.from('categories').update({ name: editCatName.trim(), slug: toSlug(editCatName) }).eq('id', editingCat.id)
+    setEditingCat(null)
+    setEditCatName('')
     await fetchCategories()
     setSavingCat(false)
   }
@@ -190,16 +202,41 @@ export default function AdminPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {categories.length === 0 && <p style={{ color: '#9ca3af', fontSize: '14px' }}>No hay categorías aún.</p>}
               {categories.map(cat => (
-                <div key={cat.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '14px 18px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <span style={{ fontSize: '20px' }}>📁</span>
-                    <span style={{ fontWeight: 600, color: '#111' }}>{cat.name}</span>
-                    <span style={{ fontSize: '12px', color: '#9ca3af' }}>/{cat.slug}</span>
-                  </div>
-                  <button onClick={() => handleDeleteCategory(cat.id)}
-                    style={{ background: '#fef2f2', color: '#dc2626', border: '1px solid #fca5a5', borderRadius: '6px', padding: '6px 14px', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}>
-                    Eliminar
-                  </button>
+                <div key={cat.id} style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '14px 18px' }}>
+                  {editingCat?.id === cat.id ? (
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                      <input type="text" value={editCatName}
+                        onChange={e => setEditCatName(e.target.value)}
+                        onKeyDown={e => e.key === 'Enter' && handleEditCategory()}
+                        style={{ flex: 1, border: '1.5px solid #e5e7eb', borderRadius: '8px', padding: '8px 12px', fontSize: '14px', outline: 'none' }} />
+                      <button onClick={handleEditCategory} disabled={savingCat}
+                        style={{ background: '#000', color: '#facc15', border: 'none', borderRadius: '6px', padding: '8px 14px', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}>
+                        {savingCat ? '...' : 'Guardar'}
+                      </button>
+                      <button onClick={() => setEditingCat(null)}
+                        style={{ background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: '6px', padding: '8px 14px', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}>
+                        Cancelar
+                      </button>
+                    </div>
+                  ) : (
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <span style={{ fontSize: '20px' }}>📁</span>
+                        <span style={{ fontWeight: 600, color: '#111' }}>{cat.name}</span>
+                        <span style={{ fontSize: '12px', color: '#9ca3af' }}>/{cat.slug}</span>
+                      </div>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <button onClick={() => { setEditingCat(cat); setEditCatName(cat.name) }}
+                          style={{ background: '#f3f4f6', color: '#111', border: 'none', borderRadius: '6px', padding: '6px 14px', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}>
+                          Editar
+                        </button>
+                        <button onClick={() => handleDeleteCategory(cat.id)}
+                          style={{ background: '#fef2f2', color: '#dc2626', border: '1px solid #fca5a5', borderRadius: '6px', padding: '6px 14px', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}>
+                          Eliminar
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

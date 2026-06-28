@@ -463,24 +463,51 @@ function PedidosAdmin() {
         {orders.map(order => {
           const sc = statusColors[order.status] || { bg: '#f3f4f6', color: '#6b7280' }
           return (
-            <div key={order.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '14px 18px' }}>
-              <div>
-                <p style={{ fontWeight: 700, color: '#111', margin: 0 }}>#{order.id.slice(0, 8)}</p>
-                <p style={{ fontSize: '13px', color: '#6b7280', margin: '2px 0 0' }}>
-                  {order.phone || 'Cliente'} · ${order.total?.toLocaleString('es-CO')} · {new Date(order.created_at).toLocaleDateString('es-CO')}
-                </p>
+            <div key={order.id} style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '16px 18px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                <div>
+                  <p style={{ fontWeight: 700, color: '#111', margin: '0 0 4px' }}>#{order.id.slice(0, 8)}</p>
+                  <p style={{ fontSize: '13px', color: '#6b7280', margin: 0 }}>
+                    {order.phone || 'Sin teléfono'} · {new Date(order.created_at).toLocaleDateString('es-CO')}
+                  </p>
+                  {order.shipping_address && (
+                    <p style={{ fontSize: '13px', color: '#9ca3af', margin: '2px 0 0' }}>📍 {order.shipping_address}</p>
+                  )}
+                  {order.notes && (
+                    <p style={{ fontSize: '13px', color: '#9ca3af', margin: '2px 0 0' }}>📝 {order.notes}</p>
+                  )}
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <span style={{ fontSize: '12px', padding: '4px 12px', borderRadius: '999px', fontWeight: 700, background: sc.bg, color: sc.color }}>
+                    {order.status}
+                  </span>
+                  <select value={order.status} onChange={e => updateStatus(order.id, e.target.value)}
+                    style={{ border: '1.5px solid #e5e7eb', borderRadius: '8px', padding: '6px 10px', fontSize: '13px', outline: 'none', cursor: 'pointer' }}>
+                    {['pendiente', 'confirmado', 'enviado', 'entregado', 'cancelado'].map(s => (
+                      <option key={s} value={s}>{s}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <span style={{ fontSize: '12px', padding: '4px 12px', borderRadius: '999px', fontWeight: 700, background: sc.bg, color: sc.color }}>
-                  {order.status}
-                </span>
-                <select value={order.status} onChange={e => updateStatus(order.id, e.target.value)}
-                  style={{ border: '1.5px solid #e5e7eb', borderRadius: '8px', padding: '6px 10px', fontSize: '13px', outline: 'none', cursor: 'pointer' }}>
-                  {['pendiente', 'confirmado', 'enviado', 'entregado', 'cancelado'].map(s => (
-                    <option key={s} value={s}>{s}</option>
-                  ))}
-                </select>
-              </div>
+
+              {/* Productos del pedido */}
+              {order.order_items && order.order_items.length > 0 && (
+                <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: '12px' }}>
+                  <p style={{ fontSize: '12px', fontWeight: 700, color: '#374151', margin: '0 0 8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Productos</p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    {order.order_items.map((item: any) => (
+                      <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '13px' }}>
+                        <span style={{ color: '#374151' }}>• {item.products?.name || 'Producto'} x{item.quantity}</span>
+                        <span style={{ fontWeight: 600, color: '#111' }}>${(item.unit_price * item.quantity).toLocaleString('es-CO')}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{ borderTop: '1px solid #e5e7eb', marginTop: '10px', paddingTop: '10px', display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: '14px', fontWeight: 700 }}>Total</span>
+                    <span style={{ fontSize: '16px', fontWeight: 900, color: '#111' }}>${order.total?.toLocaleString('es-CO')}</span>
+                  </div>
+                </div>
+              )}
             </div>
           )
         })}

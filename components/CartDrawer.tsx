@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { supabase } from '@/lib/supabase'
+import { supabase, cartEvents } from '@/lib/supabase'
 
 interface CartItem {
   id: string
@@ -37,12 +37,14 @@ export default function CartDrawer({ open, onClose }: { open: boolean; onClose: 
   async function removeItem(itemId: string) {
     await supabase.from('cart_items').delete().eq('id', itemId)
     setItems(prev => prev.filter(i => i.id !== itemId))
+    cartEvents.emit()
   }
 
   async function updateQuantity(itemId: string, quantity: number) {
     if (quantity < 1) return
     await supabase.from('cart_items').update({ quantity }).eq('id', itemId)
     setItems(prev => prev.map(i => i.id === itemId ? { ...i, quantity } : i))
+    cartEvents.emit()
   }
 
   const subtotal = items.reduce((sum, item) => sum + item.products.price * item.quantity, 0)

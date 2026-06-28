@@ -256,8 +256,8 @@ export default function Home() {
                   )}
                   <Link href={`/productos/${product.slug}`} style={{ textDecoration: 'none' }}>
                     <h3 style={{ fontWeight: 700, color: '#111', marginTop: '4px', fontSize: '15px', lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', transition: 'background 0.2s', borderRadius: '4px', padding: '2px 4px', margin: '4px -4px 0' }}
-                      onMouseEnter={e => (e.currentTarget.style.background = '#fef08a')}
-                      onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
+                      onMouseEnter={e => (e.currentTarget.style.color = '#ca8a04')}
+                      onMouseLeave={e => (e.currentTarget.style.color = '#111')}>
                       {product.name}
                     </h3>
                   </Link>

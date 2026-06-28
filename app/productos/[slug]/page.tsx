@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { supabase } from '@/lib/supabase'
+import { supabase, cartEvents } from '@/lib/supabase'
 
 export default function ProductoPage() {
   const pathname = usePathname()
@@ -59,6 +59,7 @@ export default function ProductoPage() {
     }
     setAdding(false)
     setAdded(true)
+    cartEvents.emit()
     setTimeout(() => setAdded(false), 2000)
   }
 

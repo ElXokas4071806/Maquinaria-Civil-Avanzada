@@ -245,7 +245,28 @@ export default function Home() {
                     </span>
                   )}
                   <Link href={`/productos/${product.slug}`}>
-                    <h3 style={{ fontWeight: 700, color: '#111', marginTop: '4px', fontSize: '15px', lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                  <div style={{ background: '#f3f4f6', height: '200px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', position: 'relative' }}
+                    onMouseEnter={e => {
+                      const img = e.currentTarget.querySelector('img') as HTMLImageElement
+                      if (img) {
+                        img.style.transform = 'scale(1.07)'
+                        if (product.images?.[1]) img.src = product.images[1]
+                      }
+                    }}
+                    onMouseLeave={e => {
+                      const img = e.currentTarget.querySelector('img') as HTMLImageElement
+                      if (img) {
+                        img.style.transform = 'scale(1)'
+                        if (product.images?.[0]) img.src = product.images[0]
+                      }
+                    }}>
+                    {product.images?.[0] ? (
+                      <img src={product.images[0]} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s ease' }} />
+                    ) : (
+                      <span style={{ fontSize: '48px' }}>⚙️</span>
+                    )}
+                  </div>
+                </Link>                 <h3 style={{ fontWeight: 700, color: '#111', marginTop: '4px', fontSize: '15px', lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                       {product.name}
                     </h3>
                   </Link>

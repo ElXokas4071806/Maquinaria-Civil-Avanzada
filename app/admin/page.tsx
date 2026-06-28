@@ -447,6 +447,13 @@ function PedidosAdmin() {
     setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o))
   }
 
+  async function deleteOrder(id: string) {
+    if (!confirm('¿Eliminar este pedido?')) return
+    await supabase.from('order_items').delete().eq('order_id', id)
+    await supabase.from('orders').delete().eq('id', id)
+    setOrders(prev => prev.filter(o => o.id !== id))
+  }
+
   const statusColors: Record<string, { bg: string; color: string }> = {
     pendiente: { bg: '#fffbeb', color: '#ca8a04' },
     confirmado: { bg: '#eff6ff', color: '#2563eb' },
@@ -487,6 +494,10 @@ function PedidosAdmin() {
                       <option key={s} value={s}>{s}</option>
                     ))}
                   </select>
+                  <button onClick={() => deleteOrder(order.id)}
+                    style={{ background: '#fef2f2', color: '#dc2626', border: '1px solid #fca5a5', borderRadius: '6px', padding: '6px 14px', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}>
+                    Eliminar
+                  </button>
                 </div>
               </div>
 

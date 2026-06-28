@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
+import CartDrawer from '@/components/CartDrawer'
 
 interface Product {
   id: string
@@ -30,7 +31,7 @@ export default function Home() {
   const [addingToCart, setAddingToCart] = useState<string | null>(null)
   const [user, setUser] = useState<any>(null)
   const [currentSlide, setCurrentSlide] = useState(0)
-
+  const [cartOpen, setCartOpen] = useState(false)
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
@@ -101,6 +102,8 @@ export default function Home() {
       await supabase.from('cart_items').insert({ user_id: user.id, product_id: productId, quantity: 1 })
     }
     setAddingToCart(null)
+    setCartOpen(true)
+    setTimeout(() => setCartOpen(false), 5000)
   }
 
   return (
@@ -306,6 +309,7 @@ export default function Home() {
           </div>
         )}
       </div>
+    <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
     </div>
   )
 }

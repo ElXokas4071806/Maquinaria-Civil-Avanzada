@@ -25,7 +25,7 @@ export default function RootLayout({
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
                 <span style={{ color: '#facc15', fontSize: '24px' }}>⚙</span>
-                <span style={{ fontWeight: 800, fontSize: '18px' }}>MC <span style={{ color: '#facc15' }}>A</span></span>
+                <span style={{ fontWeight: 800, fontSize: '18px' }}>Maquinaria Civil <span style={{ color: '#facc15' }}>Avanzada</span></span>
               </div>
               <p style={{ color: '#9ca3af', fontSize: '14px', lineHeight: 1.7, marginBottom: '20px' }}>
                 Herramientas y equipos de alta calidad para tu obra. Asesoría experta y envíos a todo Colombia.

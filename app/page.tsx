@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 
@@ -54,13 +54,12 @@ export default function Home() {
   }
 
   async function fetchFeatured() {
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('products')
       .select('*, categories(name)')
       .eq('active', true)
       .eq('featured', true)
       .order('created_at', { ascending: false })
-    console.log('destacados:', data, 'error:', error)
     if (data) setFeaturedProducts(data)
   }
 
@@ -170,7 +169,6 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Flechas */}
               {featuredProducts.length > 1 && (
                 <>
                   <button onClick={() => setCurrentSlide(prev => (prev - 1 + featuredProducts.length) % featuredProducts.length)}
@@ -184,7 +182,6 @@ export default function Home() {
                 </>
               )}
 
-              {/* Indicadores */}
               {featuredProducts.length > 1 && (
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '32px' }}>
                   {featuredProducts.map((_, i) => (
@@ -229,22 +226,6 @@ export default function Home() {
                 onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.1)')}
                 onMouseLeave={e => (e.currentTarget.style.boxShadow = 'none')}>
                 <Link href={`/productos/${product.slug}`}>
-                  <div style={{ background: '#f3f4f6', height: '200px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', position: 'relative' }}>
-                    {product.images?.[0] ? (
-                      <img src={product.images[0]} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    ) : (
-                      <span style={{ fontSize: '48px' }}>⚙️</span>
-                    )}
-    
-                  </div>
-                </Link>
-                <div style={{ padding: '16px' }}>
-                  {product.categories && (
-                    <span style={{ fontSize: '11px', color: '#ca8a04', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      {product.categories.name}
-                    </span>
-                  )}
-                  <Link href={`/productos/${product.slug}`}>
                   <div style={{ background: '#f3f4f6', height: '200px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', position: 'relative' }}
                     onMouseEnter={e => {
                       const img = e.currentTarget.querySelector('img') as HTMLImageElement
@@ -266,7 +247,15 @@ export default function Home() {
                       <span style={{ fontSize: '48px' }}>⚙️</span>
                     )}
                   </div>
-                </Link>                 <h3 style={{ fontWeight: 700, color: '#111', marginTop: '4px', fontSize: '15px', lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                </Link>
+                <div style={{ padding: '16px' }}>
+                  {product.categories && (
+                    <span style={{ fontSize: '11px', color: '#ca8a04', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      {product.categories.name}
+                    </span>
+                  )}
+                  <Link href={`/productos/${product.slug}`}>
+                    <h3 style={{ fontWeight: 700, color: '#111', marginTop: '4px', fontSize: '15px', lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                       {product.name}
                     </h3>
                   </Link>

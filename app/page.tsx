@@ -235,11 +235,7 @@ export default function Home() {
                     ) : (
                       <span style={{ fontSize: '48px' }}>⚙️</span>
                     )}
-                    {product.featured && (
-                      <span style={{ position: 'absolute', top: '10px', left: '10px', background: '#facc15', color: '#000', fontSize: '11px', fontWeight: 800, padding: '3px 8px', borderRadius: '999px' }}>
-                        ⭐ Destacado
-                      </span>
-                    )}
+    
                   </div>
                 </Link>
                 <div style={{ padding: '16px' }}>

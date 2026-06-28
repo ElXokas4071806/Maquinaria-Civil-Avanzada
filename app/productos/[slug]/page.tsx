@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { supabase, cartEvents } from '@/lib/supabase'
+import CartDrawer from '@/components/CartDrawer'
 
 export default function ProductoPage() {
   const pathname = usePathname()
@@ -15,6 +16,7 @@ export default function ProductoPage() {
   const [added, setAdded] = useState(false)
   const [user, setUser] = useState<any>(null)
   const [selectedImage, setSelectedImage] = useState(0)
+  const [cartOpen, setCartOpen] = useState(false)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -60,7 +62,9 @@ export default function ProductoPage() {
     setAdding(false)
     setAdded(true)
     cartEvents.emit()
+    setCartOpen(true)
     setTimeout(() => setAdded(false), 2000)
+    setTimeout(() => setCartOpen(false), 5000)
   }
 
   if (loading) return (
@@ -191,7 +195,7 @@ export default function ProductoPage() {
           </div>
         </div>
       )}
-
+<CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
     </div>
   )
 }

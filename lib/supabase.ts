@@ -11,3 +11,13 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     storageKey: 'ferreteria-auth',
   }
 })
+
+// Sistema de eventos para actualizar el carrito en tiempo real
+export const cartEvents = {
+  listeners: new Set<() => void>(),
+  emit() { this.listeners.forEach(fn => fn()) },
+  subscribe(fn: () => void) {
+    this.listeners.add(fn)
+    return () => this.listeners.delete(fn)
+  }
+}

@@ -3,11 +3,13 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import CartDrawer from './CartDrawer'
+import { cartEvents } from '@/lib/supabase'
 
 export default function Navbar() {
   const [user, setUser] = useState<any>(null)
   const [role, setRole] = useState<string>('')
   const [cartCount, setCartCount] = useState(0)
+  const [cartTotal, setCartTotal] = useState(0)
   const [cartOpen, setCartOpen] = useState(false)
 
   useEffect(() => {
@@ -17,6 +19,12 @@ export default function Navbar() {
         fetchProfile(session.user.id)
         fetchCartCount(session.user.id)
       }
+    })
+
+    const unsubscribeCart = cartEvents.subscribe(() => {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session?.user) fetchCartCount(session.user.id)
+      })
     })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -30,7 +38,10 @@ export default function Navbar() {
       }
     })
 
-    return () => subscription.unsubscribe()
+    return () => {
+      subscription.unsubscribe()
+      unsubscribeCart()
+    }
   }, [])
 
   async function fetchProfile(userId: string) {
@@ -39,10 +50,15 @@ export default function Navbar() {
   }
 
   async function fetchCartCount(userId: string) {
-    const { data } = await supabase.from('cart_items').select('quantity').eq('user_id', userId)
+    const { data } = await supabase
+      .from('cart_items')
+      .select('quantity, products(price)')
+      .eq('user_id', userId)
     if (data) {
-      const total = data.reduce((sum, item) => sum + item.quantity, 0)
-      setCartCount(total)
+      const count = data.reduce((sum, item) => sum + item.quantity, 0)
+      const total = data.reduce((sum, item: any) => sum + item.products.price * item.quantity, 0)
+      setCartCount(count)
+      setCartTotal(total)
     }
   }
 
@@ -70,6 +86,11 @@ export default function Navbar() {
                 <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
               </svg>
               Carrito
+              {cartTotal > 0 && (
+                <span style={{ fontSize: '12px', color: '#facc15', fontWeight: 700 }}>
+                  ${cartTotal.toLocaleString('es-CO')}
+                </span>
+              )}
               {cartCount > 0 && (
                 <span style={{ position: 'absolute', top: '-8px', right: '-12px', background: '#facc15', color: '#000', fontSize: '11px', borderRadius: '999px', width: '18px', height: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800 }}>
                   {cartCount}

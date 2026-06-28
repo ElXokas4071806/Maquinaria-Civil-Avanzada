@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import CartDrawer from '@/components/CartDrawer'
+import { cartEvents } from '@/lib/supabase'
 
 interface Product {
   id: string
@@ -102,6 +103,7 @@ export default function Home() {
       await supabase.from('cart_items').insert({ user_id: user.id, product_id: productId, quantity: 1 })
     }
     setAddingToCart(null)
+    cartEvents.emit()
     setCartOpen(true)
     setTimeout(() => setCartOpen(false), 5000)
   }

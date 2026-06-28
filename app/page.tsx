@@ -122,7 +122,7 @@ export default function Home() {
         <div style={{ background: '#f9fafb', padding: '48px 0', marginBottom: '48px', borderBottom: '1px solid #e5e7eb' }}>
           <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 60px' }}>
             <p style={{ color: '#ca8a04', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '24px' }}>
-              ⭐ Productos destacados
+              Productos destacados
             </p>
             <div style={{ position: 'relative' }}>
               <div style={{ overflow: 'hidden' }}>

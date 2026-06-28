@@ -3,7 +3,7 @@ import './globals.css'
 import Navbar from '@/components/Navbar'
 
 export const metadata: Metadata = {
-  title: 'Maquinaria Civil Avanzada',
+  title: 'MCA',
   description: 'Herramientas y equipos para construcción en Colombia',
 }
 

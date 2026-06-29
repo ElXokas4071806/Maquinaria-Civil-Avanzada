@@ -122,7 +122,7 @@ export default function Home() {
       {/* Hero */}
       <div style={{ background: '#000', color: '#fff', width: '100%', padding: isMobile ? '40px 16px' : '60px 24px', textAlign: 'center' }}>
         <h1 style={{ fontSize: isMobile ? '32px' : '48px', fontWeight: 800, marginBottom: '12px' }}>
-          Maquinaria Civil <span style={{ color: '#facc15' }}>Avanzada</span>
+          MC<span style={{ color: '#facc15' }}>A</span>
         </h1>
         <p style={{ color: '#9ca3af', fontSize: isMobile ? '15px' : '18px' }}>
           Herramientas y equipos de alta calidad para tu obra

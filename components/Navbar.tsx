@@ -1,9 +1,8 @@
 'use client'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { supabase } from '@/lib/supabase'
+import { supabase, cartEvents } from '@/lib/supabase'
 import CartDrawer from './CartDrawer'
-import { cartEvents } from '@/lib/supabase'
 
 export default function Navbar() {
   const [user, setUser] = useState<any>(null)
@@ -11,6 +10,7 @@ export default function Navbar() {
   const [cartCount, setCartCount] = useState(0)
   const [cartTotal, setCartTotal] = useState(0)
   const [cartOpen, setCartOpen] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -21,12 +21,6 @@ export default function Navbar() {
       }
     })
 
-    const unsubscribeCart = cartEvents.subscribe(() => {
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        if (session?.user) fetchCartCount(session.user.id)
-      })
-    })
-
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
       if (session?.user) {
@@ -34,8 +28,15 @@ export default function Navbar() {
         fetchCartCount(session.user.id)
       } else {
         setCartCount(0)
+        setCartTotal(0)
         setRole('')
       }
+    })
+
+    const unsubscribeCart = cartEvents.subscribe(() => {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session?.user) fetchCartCount(session.user.id)
+      })
     })
 
     return () => {
@@ -68,15 +69,17 @@ export default function Navbar() {
 
   return (
     <>
-      <nav style={{ background: '#000', color: '#fff', boxShadow: '0 2px 8px rgba(0,0,0,0.3)', position: 'sticky', top: 0, zIndex: 50 }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '16px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <nav style={{ background: '#000', color: '#fff', position: 'sticky', top: 0, zIndex: 50, boxShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
 
-          <Link href="/" style={{ fontSize: '18px', fontWeight: 800, textDecoration: 'none', color: '#fff', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ color: '#facc15', fontSize: '22px' }}>⚙</span>
-            Maquinaria Civil<span style={{ color: '#facc15' }}>Avanzada</span>
+          {/* Logo */}
+          <Link href="/" style={{ fontSize: '15px', fontWeight: 800, textDecoration: 'none', color: '#fff', display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+            <span style={{ color: '#facc15', fontSize: '18px' }}>⚙</span>
+            <span>Maquinaria <span style={{ color: '#facc15' }}>Civil Avanzada</span></span>
           </Link>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '24px', fontSize: '14px', fontWeight: 600 }}>
+          {/* Desktop links */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px', fontSize: '14px', fontWeight: 600 }}>
             <Link href="/" style={{ color: '#fff', textDecoration: 'none' }}>Productos</Link>
 
             <button onClick={() => setCartOpen(true)}
@@ -86,25 +89,24 @@ export default function Navbar() {
                 <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
               </svg>
               Carrito
-              {cartTotal > 0 && (
-                <span style={{ fontSize: '12px', color: '#facc15', fontWeight: 700 }}>
-                  ${cartTotal.toLocaleString('es-CO')}
-                </span>
-              )}
               {cartCount > 0 && (
-                <span style={{ position: 'absolute', top: '-8px', right: '-12px', background: '#facc15', color: '#000', fontSize: '11px', borderRadius: '999px', width: '18px', height: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800 }}>
+                <span style={{ position: 'absolute', top: '-8px', right: '-12px', background: '#facc15', color: '#000', fontSize: '10px', borderRadius: '999px', width: '17px', height: '17px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800 }}>
                   {cartCount}
                 </span>
               )}
             </button>
 
+            {cartTotal > 0 && (
+              <span style={{ fontSize: '12px', color: '#facc15', fontWeight: 700 }}>
+                ${cartTotal.toLocaleString('es-CO')}
+              </span>
+            )}
+
             {user ? (
               <>
-                <Link href="/pedidos" style={{ color: '#fff', textDecoration: 'none' }}>Mis pedidos</Link>
+                <Link href="/pedidos" style={{ color: '#fff', textDecoration: 'none' }}>Pedidos</Link>
                 {role === 'admin' && (
-                  <Link href="/admin" style={{ color: '#facc15', textDecoration: 'none', fontWeight: 800 }}>
-                    ⚙ Admin
-                  </Link>
+                  <Link href="/admin" style={{ color: '#facc15', textDecoration: 'none', fontWeight: 800 }}>Admin</Link>
                 )}
                 <button onClick={handleLogout} style={{ color: '#fff', background: 'none', border: 'none', cursor: 'pointer', fontSize: '14px', fontWeight: 600 }}>
                   Salir
@@ -113,7 +115,7 @@ export default function Navbar() {
             ) : (
               <>
                 <Link href="/login" style={{ color: '#fff', textDecoration: 'none' }}>Ingresar</Link>
-                <Link href="/registro" style={{ background: '#facc15', color: '#000', padding: '8px 18px', borderRadius: '999px', textDecoration: 'none', fontWeight: 800 }}>
+                <Link href="/registro" style={{ background: '#facc15', color: '#000', padding: '7px 16px', borderRadius: '999px', textDecoration: 'none', fontWeight: 800, fontSize: '13px' }}>
                   Registrarse
                 </Link>
               </>

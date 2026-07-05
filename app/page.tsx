@@ -140,8 +140,8 @@ export default function Home() {
               <div style={{ overflow: 'hidden' }}>
                 <div style={{ display: 'flex', transition: 'transform 0.5s ease', transform: `translateX(-${currentSlide * 100}%)` }}>
                   {featuredProducts.map((product) => (
-                    <div key={product.id} style={{ minWidth: '100%', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? '24px' : '48px', alignItems: 'center' }}>
-                      <div style={{ borderRadius: '16px', overflow: 'hidden', background: '#fff', border: '1px solid #e5e7eb', aspectRatio: '1', display: 'flex', alignItems: 'center', justifyContent: 'center', maxHeight: isMobile ? '240px' : 'none' }}>
+                    <div key={product.id} style={{ minWidth: '100%', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? '16px' : '48px', alignItems: 'center', padding: isMobile ? '0 32px' : '0' }}>
+                      <div style={{ borderRadius: '16px', overflow: 'hidden', background: '#fff', border: '1px solid #e5e7eb', aspectRatio: '1', display: 'flex', alignItems: 'center', justifyContent: 'center', maxHeight: isMobile ? '200px' : 'none' }}>
                         {product.images?.[0] ? (
                           <img src={product.images[0]} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         ) : (

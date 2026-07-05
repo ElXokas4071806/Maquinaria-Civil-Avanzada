@@ -239,7 +239,7 @@ export default function Home() {
                 onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.1)')}
                 onMouseLeave={e => (e.currentTarget.style.boxShadow = 'none')}>
                 <Link href={`/productos/${product.slug}`}>
-                  <div style={{ background: '#f3f4f6', height: isMobile ? '140px' : '200px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', position: 'relative' }}
+                  <div style={{ background: '#f3f4f6', height: isMobile ? '160px' : '220px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', position: 'relative' }}
                     onMouseEnter={e => {
                       const img = e.currentTarget.querySelector('img') as HTMLImageElement
                       if (img) {
@@ -255,7 +255,7 @@ export default function Home() {
                       }
                     }}>
                     {product.images?.[0] ? (
-                      <img src={product.images[0]} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s ease' }} />
+                      <img src={product.images[0]} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'contain', transition: 'transform 0.4s ease', padding: '8px' }} />
                     ) : (
                       <span style={{ fontSize: isMobile ? '32px' : '48px' }}>⚙️</span>
                     )}

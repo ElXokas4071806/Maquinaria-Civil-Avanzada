@@ -70,7 +70,7 @@ export default function Navbar() {
   return (
     <>
       <nav style={{ background: '#000', color: '#fff', position: 'sticky', top: 0, zIndex: 50, boxShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', overflow: 'hidden' }}>
 
           {/* Logo */}
           <Link href="/" style={{ fontSize: '15px', fontWeight: 800, textDecoration: 'none', color: '#fff', display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>

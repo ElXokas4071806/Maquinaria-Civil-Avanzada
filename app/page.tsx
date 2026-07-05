@@ -117,7 +117,7 @@ export default function Home() {
   }
 
   return (
-    <div style={{ width: '100%' }}>
+    <div style={{ width: '100%', overflowX: 'hidden' }}>
 
       {/* Hero */}
       <div style={{ background: '#000', color: '#fff', width: '100%', padding: isMobile ? '40px 16px' : '60px 24px', textAlign: 'center' }}>

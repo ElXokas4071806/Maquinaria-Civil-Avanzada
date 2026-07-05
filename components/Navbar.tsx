@@ -73,7 +73,7 @@ export default function Navbar() {
 
           <Link href="/" style={{ fontSize: '18px', fontWeight: 800, textDecoration: 'none', color: '#fff', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span style={{ color: '#facc15', fontSize: '22px' }}>⚙</span>
-            Maquinaria Civil<span style={{ color: '#facc15' }}>&nbsp;Avanzada</span>
+            Maquinaria Civil<span style={{ color: '#facc15' }}>Avanzada</span>
           </Link>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '24px', fontSize: '14px', fontWeight: 600 }}>

@@ -255,7 +255,7 @@ export default function Home() {
                       }
                     }}>
                     {product.images?.[0] ? (
-                      <img src={product.images[0]} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'contain', transition: 'transform 0.4s ease', padding: '8px' }} />
+                      <img src={product.images[0]} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s ease' }} />
                     ) : (
                       <span style={{ fontSize: isMobile ? '32px' : '48px' }}>⚙️</span>
                     )}

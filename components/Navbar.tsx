@@ -81,11 +81,25 @@ export default function Navbar() {
             <span style={{ display: 'block', width: '22px', height: '2px', background: menuOpen ? '#facc15' : '#fff', transition: 'all 0.3s', transform: menuOpen ? 'rotate(-45deg) translate(5px, -5px)' : 'none' }} />
           </button>
 
-          {/* Logo centrado */}
-          <Link href="/" style={{ fontSize: '15px', fontWeight: 800, textDecoration: 'none', color: '#fff', display: 'flex', alignItems: 'center', gap: '6px', position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
-            <span style={{ color: '#facc15', fontSize: '18px' }}>⚙</span>
-            <span>MCA</span>
-          </Link>
+          {/* Barra de búsqueda centrada */}
+          <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', width: '40%', minWidth: '200px', maxWidth: '400px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', background: '#1a1a1a', borderRadius: '999px', padding: '6px 14px', gap: '8px' }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+              <input
+                type="text"
+                placeholder="Buscar productos..."
+                style={{ background: 'none', border: 'none', outline: 'none', color: '#fff', fontSize: '13px', width: '100%' }}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') {
+                    const val = (e.target as HTMLInputElement).value.trim()
+                    if (val) window.location.href = `/?search=${encodeURIComponent(val)}`
+                  }
+                }}
+              />
+            </div>
+          </div>
 
           {/* Carrito a la derecha */}
           <button onClick={() => setCartOpen(true)}

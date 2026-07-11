@@ -47,10 +47,6 @@ export default function Navbar() {
       if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
         setShowSuggestions(false)
       }
-      const nav = document.querySelector('nav')
-      if (nav && !nav.contains(e.target as Node)) {
-        setMenuOpen(false)
-      }
     }
 
     const handleScroll = () => setMenuOpen(false)

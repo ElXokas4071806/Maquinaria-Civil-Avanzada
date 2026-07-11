@@ -174,4 +174,68 @@ export default function Navbar() {
                   {suggestions.map(product => (
                     <Link key={product.id} href={`/productos/${product.slug}`}
                       onClick={() => { setShowSuggestions(false); setSearchQuery(''); setMenuOpen(false) }}
-                      style={{ display: 'flex', alignItems: 'center',
+                      style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 14px', textDecoration: 'none', borderBottom: '1px solid #f3f4f6', background: '#fff' }}
+                      onMouseEnter={e => (e.currentTarget.style.background = '#f9fafb')}
+                      onMouseLeave={e => (e.currentTarget.style.background = '#fff')}>
+                      <div style={{ width: '40px', height: '40px', borderRadius: '6px', overflow: 'hidden', background: '#f3f4f6', flexShrink: 0 }}>
+                        {product.images?.[0] ? (
+                          <img src={product.images[0]} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        ) : (
+                          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px' }}>⚙️</div>
+                        )}
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <p style={{ margin: 0, fontSize: '13px', fontWeight: 600, color: '#111' }}>{product.name}</p>
+                        <p style={{ margin: 0, fontSize: '12px', color: '#ca8a04', fontWeight: 700 }}>${product.price.toLocaleString('es-CO')}</p>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {cartTotal > 0 && (
+              <div style={{ background: '#1a1a1a', borderRadius: '8px', padding: '10px 16px', marginBottom: '4px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ color: '#9ca3af', fontSize: '13px' }}>Total carrito</span>
+                <span style={{ color: '#facc15', fontWeight: 800, fontSize: '15px' }}>${cartTotal.toLocaleString('es-CO')}</span>
+              </div>
+            )}
+
+            {[
+              { label: 'Productos', href: '/' },
+              { label: 'Mi carrito', href: '#', onClick: () => { setMenuOpen(false); setCartOpen(true) } },
+              ...(user ? [
+                { label: 'Mis pedidos', href: '/pedidos' },
+                ...(role === 'admin' ? [{ label: '⚙ Admin', href: '/admin' }] : []),
+              ] : [
+                { label: 'Ingresar', href: '/login' },
+                { label: 'Registrarse', href: '/registro' },
+              ]),
+            ].map((item: any) => (
+              item.onClick ? (
+                <button key={item.label} onClick={item.onClick}
+                  style={{ background: 'none', border: 'none', color: '#fff', fontSize: '15px', fontWeight: 600, padding: '12px 16px', textAlign: 'left', cursor: 'pointer', borderRadius: '8px', width: '100%' }}>
+                  {item.label}
+                </button>
+              ) : (
+                <Link key={item.label} href={item.href} onClick={() => setMenuOpen(false)}
+                  style={{ color: '#fff', textDecoration: 'none', fontSize: '15px', fontWeight: 600, padding: '12px 16px', borderRadius: '8px', display: 'block' }}>
+                  {item.label}
+                </Link>
+              )
+            ))}
+
+            {user && (
+              <button onClick={handleLogout}
+                style={{ background: 'none', border: 'none', color: '#dc2626', fontSize: '15px', fontWeight: 600, padding: '12px 16px', textAlign: 'left', cursor: 'pointer', borderRadius: '8px', width: '100%' }}>
+                Salir
+              </button>
+            )}
+          </div>
+        </div>
+      </nav>
+
+      <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
+    </>
+  )
+}

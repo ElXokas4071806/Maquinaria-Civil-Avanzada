@@ -49,7 +49,13 @@ export default function Navbar() {
       }
     }
 
-    const handleScroll = () => setMenuOpen(false)
+    let lastScrollY = window.scrollY
+    const handleScroll = () => {
+      if (Math.abs(window.scrollY - lastScrollY) > 50) {
+        setMenuOpen(false)
+        lastScrollY = window.scrollY
+      }
+    }
 
     document.addEventListener('mousedown', handleClickOutside)
     window.addEventListener('scroll', handleScroll)

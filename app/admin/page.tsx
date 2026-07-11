@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabase'
 import imageCompression from 'browser-image-compression'
 
 interface Category { id: string; name: string; slug: string }
-interface Product { id: string; name: string; price: number; stock: number; active: boolean; featured: boolean; categories: { name: string } | null }
+interface Product { id: string; name: string; price: number; stock: number; active: boolean; featured: boolean; sort_order: number; categories: { name: string } | null }
 
 export default function AdminPage() {
   const [tab, setTab] = useState<'categorias' | 'productos' | 'pedidos'>('categorias')
@@ -22,6 +22,8 @@ export default function AdminPage() {
   }>({ name: '', description: '', price: '', stock: '', category_id: '', images: [], specs: [], active: true, featured: false })
   const [savingProduct, setSavingProduct] = useState(false)
   const [uploadingImages, setUploadingImages] = useState(false)
+  const [dragIndex, setDragIndex] = useState<number | null>(null)
+  const [dragOver, setDragOver] = useState<number | null>(null)
 
   useEffect(() => { fetchCategories(); fetchProducts() }, [])
 
@@ -60,7 +62,7 @@ export default function AdminPage() {
   }
 
   async function fetchProducts() {
-    const { data } = await supabase.from('products').select('*, categories(name)').order('created_at', { ascending: false })
+    const { data } = await supabase.from('products').select('*, categories(name)').order('sort_order', { ascending: true })
     if (data) setProducts(data)
   }
 
@@ -138,6 +140,17 @@ export default function AdminPage() {
     if (!confirm('¿Eliminar este producto?')) return
     await supabase.from('products').delete().eq('id', id)
     await fetchProducts()
+  }
+
+  async function handleDrop(fromIndex: number, toIndex: number) {
+    if (fromIndex === toIndex) return
+    const reordered = [...products]
+    const [moved] = reordered.splice(fromIndex, 1)
+    reordered.splice(toIndex, 0, moved)
+    setProducts(reordered)
+    for (let i = 0; i < reordered.length; i++) {
+      await supabase.from('products').update({ sort_order: i }).eq('id', reordered[i].id)
+    }
   }
 
   async function toggleActive(p: any) {
@@ -256,8 +269,15 @@ export default function AdminPage() {
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   {products.length === 0 && <p style={{ color: '#9ca3af', fontSize: '14px' }}>No hay productos aún.</p>}
-                  {products.map(p => (
-                    <div key={p.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '14px 18px' }}>
+                  <p style={{ fontSize: '12px', color: '#9ca3af', margin: '0 0 4px' }}>Arrastra los productos para reordenarlos.</p>
+                  {products.map((p, index) => (
+                    <div key={p.id}
+                      draggable
+                      onDragStart={() => setDragIndex(index)}
+                      onDragOver={e => { e.preventDefault(); setDragOver(index) }}
+                      onDrop={() => { handleDrop(dragIndex!, index); setDragIndex(null); setDragOver(null) }}
+                      onDragEnd={() => { setDragIndex(null); setDragOver(null) }}
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: dragOver === index ? '#fffbeb' : '#f9fafb', border: dragOver === index ? '1.5px dashed #facc15' : '1px solid #e5e7eb', borderRadius: '10px', padding: '14px 18px', cursor: 'grab', transition: 'all 0.2s' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                         <span style={{ fontSize: '20px' }}>📦</span>
                         <div>

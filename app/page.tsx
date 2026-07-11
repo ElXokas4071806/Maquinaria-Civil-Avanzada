@@ -69,7 +69,7 @@ export default function Home() {
       .select('*, categories(name)')
       .eq('active', true)
       .eq('featured', true)
-      .order('created_at', { ascending: false })
+      .order('sort_order', { ascending: true })
     if (data) setFeaturedProducts(data)
   }
 

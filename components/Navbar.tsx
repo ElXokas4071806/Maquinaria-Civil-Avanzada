@@ -47,6 +47,10 @@ export default function Navbar() {
       if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
         setShowSuggestions(false)
       }
+      const target = e.target as HTMLElement
+      if (!target.closest('nav')) {
+        setMenuOpen(false)
+      }
     }
 
     document.addEventListener('mousedown', handleClickOutside)

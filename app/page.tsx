@@ -33,7 +33,6 @@ export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [cartOpen, setCartOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
-  const [search, setSearch] = useState('')
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768)
@@ -48,10 +47,7 @@ export default function Home() {
     })
     fetchCategories()
     fetchFeatured()
-    const params = new URLSearchParams(window.location.search)
-    const q = params.get('search') || ''
-    setSearch(q)
-    fetchProducts(undefined, q)
+    fetchProducts()
   }, [])
 
   useEffect(() => {
@@ -77,7 +73,7 @@ export default function Home() {
     if (data) setFeaturedProducts(data)
   }
 
-  async function fetchProducts(categoryId?: string, searchQuery?: string) {
+  async function fetchProducts(categoryId?: string) {
     setLoading(true)
     let query = supabase
       .from('products')
@@ -85,7 +81,6 @@ export default function Home() {
       .eq('active', true)
       .order('created_at', { ascending: false })
     if (categoryId) query = query.eq('category_id', categoryId)
-    if (searchQuery) query = query.ilike('name', `%${searchQuery}%`)
     const { data } = await query
     if (data) setProducts(data)
     setLoading(false)
@@ -93,8 +88,8 @@ export default function Home() {
 
   async function handleCategoryChange(slug: string, id?: string) {
     setSelectedCategory(slug)
-    if (slug === 'all') fetchProducts(undefined, search)
-    else fetchProducts(id, search)
+    if (slug === 'all') fetchProducts()
+    else fetchProducts(id)
   }
 
   async function addToCart(productId: string, stock: number) {

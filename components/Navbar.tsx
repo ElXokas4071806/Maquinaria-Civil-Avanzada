@@ -47,13 +47,22 @@ export default function Navbar() {
       if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
         setShowSuggestions(false)
       }
+      const nav = document.querySelector('nav')
+      if (nav && !nav.contains(e.target as Node)) {
+        setMenuOpen(false)
+      }
     }
+
+    const handleScroll = () => setMenuOpen(false)
+
     document.addEventListener('mousedown', handleClickOutside)
+    window.addEventListener('scroll', handleScroll)
 
     return () => {
       subscription.unsubscribe()
       unsubscribeCart()
       document.removeEventListener('mousedown', handleClickOutside)
+      window.removeEventListener('scroll', handleScroll)
     }
   }, [])
 
@@ -114,8 +123,8 @@ export default function Navbar() {
             <span style={{ display: 'block', width: '22px', height: '2px', background: menuOpen ? '#facc15' : '#fff', transition: 'all 0.3s', transform: menuOpen ? 'rotate(-45deg) translate(5px, -5px)' : 'none' }} />
           </button>
 
-          {/* Logo */}
-          <Link href="/" style={{ fontSize: '15px', fontWeight: 800, textDecoration: 'none', color: '#fff', display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+          {/* Logo centrado */}
+          <Link href="/" style={{ fontSize: '15px', fontWeight: 800, textDecoration: 'none', color: '#fff', display: 'flex', alignItems: 'center', gap: '6px', position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
             <span style={{ color: '#facc15', fontSize: '18px' }}>⚙</span>
             <span>MCA</span>
           </Link>

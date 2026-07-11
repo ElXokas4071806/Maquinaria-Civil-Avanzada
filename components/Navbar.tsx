@@ -49,22 +49,12 @@ export default function Navbar() {
       }
     }
 
-    let lastScrollY = window.scrollY
-    const handleScroll = () => {
-      if (Math.abs(window.scrollY - lastScrollY) > 50) {
-        setMenuOpen(false)
-        lastScrollY = window.scrollY
-      }
-    }
-
     document.addEventListener('mousedown', handleClickOutside)
-    window.addEventListener('scroll', handleScroll)
 
     return () => {
       subscription.unsubscribe()
       unsubscribeCart()
       document.removeEventListener('mousedown', handleClickOutside)
-      window.removeEventListener('scroll', handleScroll)
     }
   }, [])
 
